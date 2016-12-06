@@ -3,7 +3,24 @@
 
 *Example*
 <br>
-
+###html code
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<title>myframework demo</title>
+	</head>
+	<body>
+		<div>
+		<canvas width=1000 height=900 id='canvas'></canvas>
+		</div>
+		<script src='js/yzpTopo.js'></script>
+		<script src='js/main.js'></script>
+	</body>
+</html>
+```
+###javascript code
 ```javascript
 /*define node object*/
 var nodeConfig=[{
