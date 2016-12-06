@@ -1,22 +1,26 @@
-function yzpTopo(id,data){
+function yzpTopo(id,nodeConfig,lineConfig){
 	this.id=id;
-	this.data=data;
+	this.nodeConfig=nodeConfig;
+	this.lineConfig=lineConfig;
 	this.createNode=function(){
-		for(var i=0;i<this.data.length;i++){
-			if(this.data[i].end){
-			var lineconfig={
-				start:this.data[i],
-				end:this.data[i].end,
+		for(var i=0;i<this.nodeConfig.length;i++){
+			var nodes=new node(this.id,this.nodeConfig[i]);
+		}
+	};
+	this.createLine=function(){
+		for(var i=0;i<this.lineConfig.length;i++){
+		var lineconfig={
+				start:this.lineConfig[i].start,
+				end:this.lineConfig[i].end,
 				color:'rgb(150,200,150)',
 				width:5
 			}
 			new line(this.id,lineconfig);
-			}
-			var nodes=new node(this.id,this.data[i]);
 		}
-	};
+	}
 	this.init=(function(This){
 		This.createNode();
+		This.createLine();
 	})(this);
 }
 /*创建拓扑节点*/
@@ -24,6 +28,7 @@ function node(id,config){
 	var canvas=document.getElementById(id);
 	var context=canvas.getContext('2d');
 	
+	this.src=config.src||'';
 	this.name=config.name||'yzp';
 	this.coordinate=config.coordinate;
 	this.width=config.width||40;
@@ -46,12 +51,18 @@ function node(id,config){
 		})(this)
 	};
 	this.render=function(){
-		var img=new Image();
-		img.src=this.src;
-		context.beginPath();
-		context.rect(this.coordinate[0],this.coordinate[1],this.width,this.height);
-		context.fillStyle=this.color;
-		context.fill();
+		if(this.src){
+			var img=new Image();
+			img.src=this.src;
+			
+			context.beginPath();
+			context.drawImage(img,this.coordinate[0],this.coordinate[1],this.width,this.height);
+		}else{
+			context.beginPath();
+			context.rect(this.coordinate[0],this.coordinate[1],this.width,this.height);
+			context.fillStyle=this.color;
+			context.fill();
+		}
 	};
 	this.toggleInfor=function(){
 		var This=this;
@@ -63,7 +74,7 @@ function node(id,config){
 				
 			}else{
 				if(document.getElementById(This.name)){
-					document.body.removeChild(document.getElementById(This.name));
+					canvas.parentNode.removeChild(document.getElementById(This.name));
 				}
 				This.color=This.startColor;
 				This.render();
@@ -72,7 +83,7 @@ function node(id,config){
 	};
 	this.renderinfor=function(){
 		if(document.getElementById(this.name)){
-			document.body.removeChild(document.getElementById(this.name));
+			canvas.parentNode.removeChild(document.getElementById(this.name));
 		}
 		var inforbox=document.createElement('div');
 		inforbox.setAttribute('id',this.name);
@@ -85,7 +96,7 @@ function node(id,config){
 		inforbox.style.left=this.coordinate[0]-this.width/3+'px';
 		inforbox.style.padding='10px';
 		inforbox.style.borderRadius='10px';
-		document.body.appendChild(inforbox);
+		canvas.parentNode.appendChild(inforbox);
 	};
 	this.init=(function(This){
 		This.render();
@@ -125,40 +136,4 @@ function line(id,config){
 		This.render();
 		This.renderInfor();
 	})(this);
-}
-
-
-window.onload=function(){
-	var config=[{
-		name:'yzp',
-		coordinate:[100,100],
-		width:40,
-		height:40,
-		data:{
-			IQ:95,
-			EQ:60
-		},
-		end:[{
-			name:'袁泽平',
-			coordinate:[500,100],
-			width:40,
-			height:40,
-			data:{
-				智力:95,
-				情商:60
-			     }
-		    }]
-	},
-	{
-		name:'袁泽平',
-		coordinate:[500,100],
-		width:40,
-		height:40,
-		data:{
-			智力:95,
-			情商:60
-		}
-	}
-	];
-	var mytopo=new yzpTopo('canvas',config);
 }
