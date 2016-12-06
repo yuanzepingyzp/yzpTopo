@@ -1,8 +1,9 @@
 # yzpTopo
-##my topoFramework based on canvas
+##my topology framework based on canvas
 
 /*Example*/
 /*define node object*/
+```javascript
 var nodeConfig=[{
 		name:'yzp',
 		coordinate:[100,100],
@@ -24,7 +25,8 @@ var nodeConfig=[{
 		}
 	}
 	];
-	/*define line relation*/
 	var lineConfig=[{start:nodeConfig[0],end:nodeConfig[1]}];
 	var mytopo=new yzpTopo('canvas',nodeConfig,lineConfig);
+}
+```
 /*Example*/
