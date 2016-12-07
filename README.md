@@ -60,6 +60,7 @@ var nodeConfig=[{
 	height:number,/*define the height of the node ,not necessary,default value is 40*/
 	color:'string',/*define backgroundcolor of node,not necessary,default value is 'rgb(150,200,150)'*/
 	highlightColor:'string',/*define the highlightColor of the node,not necessary,default value is 'rgb(100,200,200)'*/
+	data:object{}/*define the data need to show of the node,neccesary*/
 }];
 ```
 ####line config
