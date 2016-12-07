@@ -49,4 +49,23 @@ var nodeConfig=[{
 	var mytopo=new yzpTopo('canvas',nodeConfig,lineConfig);
 }
 ```
-/*Example*/
+###API introduce
+####node config
+```javascript
+var nodeConfig=[{
+	name:'string',/*node name necessary attribute*/
+	coordinate:array[0,0],/*define the coordinate of the node is  necessary*/
+	src:'string',/*not necessary render a img if this value is available*/
+	width:number,/*define the width of the node,not necessary,default value is 40*/
+	height:number,/*define the height of the node ,not necessary,default value is 40*/
+	color:'string',/*define backgroundcolor of node,not necessary,default value is 'rgb(150,200,150)'*/
+	highlightColor:'string',/*define the highlightColor of the node,not necessary,default value is 'rgb(100,200,200)'*/
+}];
+```
+####line config
+```javascript
+var lineConfig=[{
+	start:nodeConfig[i],/*define the begin node of the line,necessary*/
+	end:nodeConfig[j],/*define the end node of the line,necessary*/
+}]
+```
