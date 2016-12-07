@@ -1,17 +1,38 @@
+var tool={
+	isOnline:function(start,p,end){
+		var distance1=Math.sqrt(Math.pow(p[0]-start[0],2)+Math.pow(p[1]-start[1],2));
+		var distance2=Math.sqrt(Math.pow(end[0]-p[0],2)+Math.pow(end[1]-p[1],2));
+		var distance=Math.sqrt(Math.pow(end[0]-start[0],2)+Math.pow(end[1]-start[1],2));
+		if(distance1+distance2-distance<1){
+			return true;
+		}else{
+			return false;
+		}
+	},
+    getObj:function(objList,key,value){
+        for(var i=0;i<objList.length;i++){
+                if(objList[i][key]===value){
+                    return objList[i];
+                }
+        }
+    }
+}
+
 function yzpTopo(id,nodeConfig,lineConfig){
+    this.nodes=[];
 	this.id=id;
 	this.nodeConfig=nodeConfig;
 	this.lineConfig=lineConfig;
 	this.createNode=function(){
 		for(var i=0;i<this.nodeConfig.length;i++){
-			var nodes=new node(this.id,this.nodeConfig[i]);
+			this.nodes.push(new node(this.id,this.nodeConfig[i]));
 		}
 	};
 	this.createLine=function(){
 		for(var i=0;i<this.lineConfig.length;i++){
 		var lineconfig={
-				start:this.lineConfig[i].start,
-				end:this.lineConfig[i].end,
+				start:tool.getObj(this.nodes,'name',this.lineConfig[i].start.name),
+				end:tool.getObj(this.nodes,'name',this.lineConfig[i].end.name),
 				color:'rgb(150,200,150)',
 				width:5
 			}
@@ -54,12 +75,11 @@ function node(id,config){
 		if(this.src){
 			var img=new Image();
 			img.src=this.src;
-			
 			context.beginPath();
 			context.drawImage(img,this.coordinate[0],this.coordinate[1],this.width,this.height);
 		}else{
 			context.beginPath();
-			context.rect(this.coordinate[0],this.coordinate[1],this.width,this.height);
+			context.rect(this.coordinate[0]-this.width/2,this.coordinate[1]-this.height/2,this.width,this.height);
 			context.fillStyle=this.color;
 			context.fill();
 		}
@@ -91,9 +111,10 @@ function node(id,config){
 		inforbox.style.backgroundColor=this.toolTip.bgColor;
 		inforbox.style.color=this.toolTip.color;
 		inforbox.style.boxShadow=this.toolTip.boxShadow;
+		canvas.parentNode.position='relative';
 		inforbox.style.position='absolute';
-		inforbox.style.top=this.coordinate[1]+1.5*this.height+'px';
-		inforbox.style.left=this.coordinate[0]-this.width/3+'px';
+		inforbox.style.top=this.coordinate[1]+this.height+'px';
+		inforbox.style.left=this.coordinate[0]-this.width/4*3+'px';
 		inforbox.style.padding='10px';
 		inforbox.style.borderRadius='10px';
 		canvas.parentNode.appendChild(inforbox);
@@ -111,29 +132,48 @@ function line(id,config){
 	this.start=config.start;
 	this.end=config.end;
 	this.color=config.color||'rgb(150,200,150)';
+    this.highlightColor=config.highlightColor||'rgb(100,200,200)';
 	this.textColor=config.color;
 	this.width=config.width;
 	this.deg=Math.atan((this.start.coordinate[1]-this.end.coordinate[1])/(this.start.coordinate[0]-this.end.coordinate[0]))*180/Math.PI;
 	this.render=function(){
 		context.beginPath();
-		context.moveTo(this.start.coordinate[0]+this.start.width/2,this.start.coordinate[1]+this.start.height/2);
-		context.lineTo(this.end.coordinate[0]+this.end.width/2,this.end.coordinate[1]+this.end.height/2);
+		context.moveTo(this.start.coordinate[0],this.start.coordinate[1]);
+		context.lineTo(this.end.coordinate[0],this.end.coordinate[1]);
 		context.lineWidth=this.width;
 		context.strokeStyle=this.color;
 		context.stroke();
 	};
 	this.renderInfor=function(){
-		var inforBox=document.createElement('h6');
+		if(document.getElementById(this.start.name+this.end.name)){
+			canvas.parentNode.removeChild(document.getElementById(this.start.name+this.end.name));
+		}
+		var inforBox=document.createElement('div');
 		inforBox.innerHTML=this.start.name+"<span style='color:rgb(200,100,100)'> 至 </span>"+this.end.name;
 		inforBox.style.position='absolute';
-		inforBox.style.left=(this.start.coordinate[0]+this.end.coordinate[0])/2+'px';
+        inforBox.setAttribute('id',this.start.name+this.end.name);
+		inforBox.style.left=(this.start.coordinate[0]+this.end.coordinate[0])/2-40+'px';
 		inforBox.style.top=(this.start.coordinate[1]+this.end.coordinate[1])/2-20+'px';
-		inforBox.style.color=this.textColor;
+		inforBox.style.color=this.highlightColor;
 		inforBox.style.transform='rotate('+this.deg+'deg)';
-		document.body.appendChild(inforBox);
-	}
+		canvas.parentNode.appendChild(inforBox);
+	};
+	this.toggleInfor=function(){
+		var This=this;
+		canvas.addEventListener('mousemove',function(){
+			if(tool.isOnline(This.start.coordinate,[event.clientX,event.clientY],This.end.coordinate)){
+				This.renderInfor();
+                This.start.color=This.start.highlightColor;
+                This.start.render();
+                This.end.color=This.start.highlightColor;
+                This.end.render();
+			}else{
+				canvas.parentNode.removeChild(document.getElementById(This.start.name+This.end.name));
+			}
+		})
+	};
 	this.init=(function(This){
 		This.render();
-		This.renderInfor();
+		This.toggleInfor();
 	})(this);
 }
